@@ -1,10 +1,11 @@
 package com.yifan;
 
+import com.yifan.utils.DirectoryGenerator;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.WorkerServiceImpl;
+import com.yifan.service.WorkerServiceImpl;
 
 import java.io.IOException;
 
@@ -19,6 +20,7 @@ public class WorkerMain {
         Server server = ServerBuilder
                 .forPort(port)
                 .addService(new WorkerServiceImpl()).build();
+        DirectoryGenerator.createWorkerDirectory(port);
         logger.info("Start worker server at port: {}", port);
         server.start();
         server.awaitTermination();

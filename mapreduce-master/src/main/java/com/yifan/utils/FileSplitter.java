@@ -33,7 +33,7 @@ public class FileSplitter {
 
     public static File createNewFile(String tempDir, int currentNumSegments, File sourceFile) {
         String newFilePath = String.format("%s\\input_%s_seg%d_%s.txt",
-                tempDir, sourceFile.getName(), currentNumSegments, UUIDGenerator.generateUniqueID());
+                tempDir, sourceFile.getName(), currentNumSegments, UUID.randomUUID());
         return new File(newFilePath);
     }
 }

@@ -1,4 +1,4 @@
-package service;
+package com.yifan.service;
 
 import com.yifan.api.Worker;
 import com.yifan.api.WorkerServiceGrpc;

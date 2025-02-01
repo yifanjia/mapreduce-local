@@ -3,17 +3,7 @@ syntax = "proto3";
 option java_package = "com.yifan.api";
 
 service WorkerService {
-  rpc uploadFile (stream FileChunk) returns (UploadStatus);
   rpc heartBeat (Empty) returns (HeartbeatResponse);
-}
-
-message FileChunk {
-  bytes data = 1;
-}
-
-message UploadStatus {
-  bool success = 1;
-  string message = 2;
 }
 
 message Empty {}
