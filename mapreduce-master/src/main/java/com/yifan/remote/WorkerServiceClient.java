@@ -10,18 +10,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class WorkerServiceClient {
     private static final Logger logger = LoggerFactory.getLogger(WorkerServiceClient.class);
     public static final Map<NetworkAddr, StubPairs> STUB_PAIRS_MAP = new ConcurrentHashMap<>();
     public static final Object STUB_PAIRS_MAP_LOCK = new Object();
+    public static final int HEART_BEAT_TIMEOUT_SECONDS = 5;
     public boolean ping(WorkerMetaData workerMetaData) {
         NetworkAddr networkAddr = workerMetaData.getNetworkAddr();
         initStubPair(networkAddr);
         StubPairs stubPairs = STUB_PAIRS_MAP.get(networkAddr);
         try {
             Worker.Empty request = Worker.Empty.newBuilder().build();
-            Worker.HeartbeatResponse response = stubPairs.getBlockingStub().heartBeat(request);
+            Worker.HeartbeatResponse response = stubPairs.getBlockingStub()
+                    .withDeadlineAfter(HEART_BEAT_TIMEOUT_SECONDS, TimeUnit.SECONDS).heartBeat(request);
             if (response.getIsAlive()) {
                 return true;
             }

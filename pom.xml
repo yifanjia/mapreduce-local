@@ -11,6 +11,7 @@
     <modules>
         <module>mapreduce-master</module>
         <module>mapreduce-common</module>
+        <module>mapreduce-worker</module>
     </modules>
 
     <properties>
