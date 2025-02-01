@@ -17,6 +17,7 @@ public class WorkerServiceClient {
     public static final Map<NetworkAddr, StubPairs> STUB_PAIRS_MAP = new ConcurrentHashMap<>();
     public static final Object STUB_PAIRS_MAP_LOCK = new Object();
     public static final int HEART_BEAT_TIMEOUT_SECONDS = 5;
+    private static final WorkerServiceClient INSTANCE = new WorkerServiceClient();
     public boolean ping(WorkerMetaData workerMetaData) {
         NetworkAddr networkAddr = workerMetaData.getNetworkAddr();
         initStubPair(networkAddr);
@@ -55,9 +56,15 @@ public class WorkerServiceClient {
         }
     }
 
+    private WorkerServiceClient() {}
+
+    public static WorkerServiceClient getInstance() {
+        return INSTANCE;
+    }
+
     public static void main(String[] args) {
         // Send periodic heartbeats
-        WorkerServiceClient workerServiceClient = new WorkerServiceClient();
+        WorkerServiceClient workerServiceClient = getInstance();
         WorkerMetaData workerMetaData = WorkerMetaData.builder()
                 .workerId("worker-1")
                 .networkAddr(NetworkAddr.builder().host("localhost").port(50051).build())

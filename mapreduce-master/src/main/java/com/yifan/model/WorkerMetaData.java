@@ -13,8 +13,6 @@ public class WorkerMetaData {
     private String workerId;
     @NonNull
     private NetworkAddr networkAddr;
-    private int mapTaskNum = 0;
-    private int reduceTaskNum = 0;
 
     @Override
     public boolean equals(Object o) {
