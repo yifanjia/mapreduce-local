@@ -16,6 +16,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lombok.version>1.18.24</lombok.version>
+        <slf4j.version>2.0.0</slf4j.version>
+        <logback-classic.version>1.4.7</logback-classic.version>
     </properties>
     <build>
         <plugins>
@@ -26,5 +29,27 @@
             </plugin>
         </plugins>
     </build>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <!-- SLF4J API -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version> <!-- Use the appropriate version -->
+            </dependency>
+            <!-- Logback Classic (SLF4J binding) -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-classic.version}</version> <!-- Use the appropriate version -->
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
