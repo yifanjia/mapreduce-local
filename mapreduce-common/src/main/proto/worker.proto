@@ -4,7 +4,7 @@ option java_package = "com.yifan.api";
 
 service WorkerService {
   rpc uploadFile (stream FileChunk) returns (UploadStatus);
-  rpc heartbeat (Empty) returns (HeartbeatResponse);
+  rpc heartBeat (stream Empty) returns (HeartbeatResponse);
 }
 
 message FileChunk {
@@ -19,6 +19,7 @@ message UploadStatus {
 message Empty {}
 
 message HeartbeatResponse {
-  bool isAlive = 1;
-  string message = 2;
+  string workerId = 1;
+  bool isAlive = 2;
+  string message = 3;
 }
