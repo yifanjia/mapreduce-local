@@ -6,9 +6,8 @@ import lombok.NonNull;
 
 @Data
 @Builder
-public class TaskReplica {
+public class NetworkAddr {
     @NonNull
-    private WorkerMetaData worker;
-    @NonNull
-    private TaskStatus taskStatus;
+    private String host;
+    private int port;
 }

@@ -8,12 +8,11 @@ import java.util.Objects;
 
 @Data
 @Builder
-public class Worker {
+public class WorkerMetaData {
     @NonNull
     private String workerId;
     @NonNull
-    private String ip;
-    private int port;
+    private NetworkAddr networkAddr;
     private int mapTaskNum = 0;
     private int reduceTaskNum = 0;
 
@@ -21,7 +20,7 @@ public class Worker {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Worker worker = (Worker) o;
+        WorkerMetaData worker = (WorkerMetaData) o;
         return Objects.equals(workerId, worker.workerId);
     }
 

@@ -1,47 +1,66 @@
 package com.yifan.remote;
 import com.yifan.api.Worker;
 import com.yifan.api.WorkerServiceGrpc;
+import com.yifan.model.NetworkAddr;
+import com.yifan.model.WorkerMetaData;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.stub.StreamObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WorkerServiceClient {
-    public static void main(String[] args) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
-                .usePlaintext()
-                .build();
-        WorkerServiceGrpc.WorkerServiceStub stub = WorkerServiceGrpc.newStub(channel);
-        StreamObserver<Worker.Empty> requestObserver = stub.heartBeat(new StreamObserver<>() {
-            @Override
-            public void onNext(Worker.HeartbeatResponse response) {
-                // Handle heartbeat response
-                System.out.println("Received heartbeat from worker: " + response.getWorkerId());
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                // Handle errors
-                System.err.println("Heartbeat stream error: " + t.getMessage());
-            }
-
-            @Override
-            public void onCompleted() {
-                // Handle stream completion
-                System.out.println("Heartbeat stream completed");
-            }
-        });
-
-        // Send periodic heartbeats
-        for (int i = 0; i < 10; i++) {
+    private static final Logger logger = LoggerFactory.getLogger(WorkerServiceClient.class);
+    public static final Map<NetworkAddr, StubPairs> STUB_PAIRS_MAP = new ConcurrentHashMap<>();
+    public static final Object STUB_PAIRS_MAP_LOCK = new Object();
+    public boolean ping(WorkerMetaData workerMetaData) {
+        NetworkAddr networkAddr = workerMetaData.getNetworkAddr();
+        initStubPair(networkAddr);
+        StubPairs stubPairs = STUB_PAIRS_MAP.get(networkAddr);
+        try {
             Worker.Empty request = Worker.Empty.newBuilder().build();
-            requestObserver.onNext(request);
-            try {
-                Thread.sleep(1000); // Send a heartbeat every second
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            Worker.HeartbeatResponse response = stubPairs.getBlockingStub().heartBeat(request);
+            if (response.getIsAlive()) {
+                return true;
+            }
+            logger.info("Worker: {} reported notAlive with response message {}", workerMetaData, response.getMessage());
+            return false;
+        } catch (Exception e) {
+            logger.error("Failed to ping worker: {} with exception", workerMetaData, e);
+            return false;
+        }
+    }
+
+    private void initStubPair(NetworkAddr networkAddr) {
+        if (!STUB_PAIRS_MAP.containsKey(networkAddr)) {
+            synchronized (STUB_PAIRS_MAP_LOCK) {
+                if (!STUB_PAIRS_MAP.containsKey(networkAddr)) { // Double-check locking
+                    ManagedChannel channel = ManagedChannelBuilder.forAddress(networkAddr.getHost(), networkAddr.getPort())
+                            .usePlaintext()
+                            .build();
+                    WorkerServiceGrpc.WorkerServiceBlockingStub blockingStub = WorkerServiceGrpc.newBlockingStub(channel);
+                    WorkerServiceGrpc.WorkerServiceStub nonBlockingStub = WorkerServiceGrpc.newStub(channel);
+                    StubPairs stubPairs = StubPairs.builder()
+                            .blockingStub(blockingStub)
+                            .nonBlockingStub(nonBlockingStub)
+                            .build();
+                    STUB_PAIRS_MAP.put(networkAddr, stubPairs);
+                }
             }
         }
-        // Complete the stream
-        requestObserver.onCompleted();
+    }
+
+    public static void main(String[] args) {
+        // Send periodic heartbeats
+        WorkerServiceClient workerServiceClient = new WorkerServiceClient();
+        WorkerMetaData workerMetaData = WorkerMetaData.builder()
+                .workerId("worker-1")
+                .networkAddr(NetworkAddr.builder().host("localhost").port(50051).build())
+                .build();
+        for (int i = 0; i < 10; i++) {
+            System.out.println(String.valueOf(i) + workerServiceClient.ping(workerMetaData));
+        }
     }
 }
