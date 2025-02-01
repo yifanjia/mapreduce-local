@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>mapreduce-master</module>
+        <module>mapreduce-common</module>
     </modules>
 
     <properties>
@@ -19,6 +20,8 @@
         <lombok.version>1.18.24</lombok.version>
         <slf4j.version>2.0.0</slf4j.version>
         <logback-classic.version>1.4.7</logback-classic.version>
+        <grpc.version>1.53.0</grpc.version>
+        <javax-annotation-api.version>1.3.2</javax-annotation-api.version>
     </properties>
     <build>
         <plugins>
@@ -48,6 +51,26 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback-classic.version}</version> <!-- Use the appropriate version -->
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty</artifactId>
+                <version>${grpc.version}</version> <!-- or the latest version -->
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-protobuf</artifactId>
+                <version>${grpc.version}</version> <!-- or the latest version -->
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-stub</artifactId>
+                <version>${grpc.version}</version> <!-- or the latest version -->
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax-annotation-api.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
